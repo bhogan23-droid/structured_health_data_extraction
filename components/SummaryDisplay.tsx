@@ -51,7 +51,7 @@ interface CardProps {
 }
 
 const InfoCard: React.FC<CardProps> = ({ title, icon, children }) => (
-    <div className="bg-surface rounded-xl shadow-sm p-6 flex flex-col border border-border-color transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
+    <div className="bg-surface rounded-xl shadow-lg p-6 flex flex-col border border-border-color transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
         <div className="flex items-center text-text-primary mb-4">
             {icon}
             <h3 className="text-xl font-semibold ml-3">{title}</h3>
@@ -96,7 +96,7 @@ export const SummaryDisplay: React.FC<{ data: HealthData }> = ({ data }) => {
                  {meals.length > 0 ? (
                     <ul className="space-y-3">
                         {meals.map((meal: Meal, index: number) => (
-                            <li key={index} className="border-t border-border-color first:border-t-0 pt-2 first:pt-0">
+                            <li key={index} className="border-t border-border-color first:border-t-0 pt-3 first:pt-0 mt-3 first:mt-0">
                                 <p className="font-semibold text-text-primary flex justify-between">
                                     <span>{meal.title}</span>
                                     <span className="font-normal text-sm text-text-muted">{meal.pertains_to}</span>
@@ -138,7 +138,7 @@ export const SummaryDisplay: React.FC<{ data: HealthData }> = ({ data }) => {
                 {sleep && sleep.score !== null ? (
                     <div className="flex justify-between items-center h-full text-text-secondary">
                         <div>
-                            <span className="font-bold text-2xl text-text-primary">{sleep.score}</span>
+                            <span className="font-bold text-3xl text-text-primary">{sleep.score}</span>
                             <span className="text-text-muted"> / 10</span>
                         </div>
                         <span className="text-sm text-text-muted flex-shrink-0">{sleep.pertains_to}</span>
@@ -162,8 +162,8 @@ export const SummaryDisplay: React.FC<{ data: HealthData }> = ({ data }) => {
             <InfoCard title="Period Status" icon={<IconWrapper bgColor="bg-pink-100"><PeriodIcon className={`${iconClass} text-pink-600`} /></IconWrapper>}>
                 {period_status ? (
                     <div className="flex justify-start items-center gap-4 text-text-secondary h-full">
-                        <span className="font-semibold text-text-primary">
-                            {period_status.status ? 'Currently on period' : 'Not on period'}
+                         <span className={`px-3 py-1 rounded-full text-sm font-medium ${period_status.status ? 'bg-rose-100 text-rose-800' : 'bg-slate-100 text-slate-800'}`}>
+                            {period_status.status ? 'On Period' : 'Not on Period'}
                         </span>
                     </div>
                 ) : <NoDataMessage message="No period status recorded." />}

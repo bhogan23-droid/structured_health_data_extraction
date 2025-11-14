@@ -13,7 +13,7 @@ declare global {
 
 interface InputFormProps {
     narrative: string;
-    onNarrativeChange: (value: string) => void;
+    onNarrativeChange: React.Dispatch<React.SetStateAction<string>>;
     onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
     isLoading: boolean;
 }
@@ -27,6 +27,18 @@ const SparklesIcon: React.FC<{className?: string}> = ({className}) => (
 const MicrophoneIcon: React.FC<{className?: string}> = ({className}) => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 0 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+    </svg>
+);
+
+const LightbulbIcon: React.FC<{className?: string}> = ({className}) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.311a7.5 7.5 0 0 1-7.5 0c-1.255 0-2.443.29-3.5.832v-1.249c0-.621.504-1.125 1.125-1.125h14.25c.621 0 1.125.504 1.125 1.125v1.249c-1.057-.542-2.245-.832-3.5-.832Z" />
+    </svg>
+);
+
+const HeartIcon: React.FC<{className?: string}> = ({className}) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
     </svg>
 );
 
@@ -69,6 +81,8 @@ export const InputForm: React.FC<InputFormProps> = ({ narrative, onNarrativeChan
         recognition.interimResults = false;
         recognition.lang = 'en-US';
 
+        const narrativeBeforeListening = narrative; // Capture state at the start of listening
+
         recognition.onstart = () => setIsListening(true);
         recognition.onend = () => {
             setIsListening(false);
@@ -79,12 +93,13 @@ export const InputForm: React.FC<InputFormProps> = ({ narrative, onNarrativeChan
             setIsListening(false);
         };
         recognition.onresult = (event: any) => {
-            const newTranscript = Array.from(event.results)
-                .slice(event.resultIndex)
+            const sessionTranscript = Array.from(event.results)
                 .map((result: any) => result[0].transcript)
                 .join('');
             
-            onNarrativeChange(narrative ? narrative + ' ' + newTranscript.trim() : newTranscript.trim());
+            onNarrativeChange(
+                [narrativeBeforeListening, sessionTranscript.trim()].filter(Boolean).join(' ')
+            );
         };
         
         recognitionRef.current = recognition;
@@ -100,7 +115,7 @@ export const InputForm: React.FC<InputFormProps> = ({ narrative, onNarrativeChan
     return (
         <div className="w-full max-w-4xl mx-auto">
             <header className="text-center mb-10">
-                <h1 className="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
+                <h1 className="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-600">
                     AI Health Data Engine
                 </h1>
                 <p className="mt-4 text-lg text-text-secondary max-w-2xl mx-auto">
@@ -108,7 +123,7 @@ export const InputForm: React.FC<InputFormProps> = ({ narrative, onNarrativeChan
                 </p>
             </header>
 
-            <main className="bg-surface rounded-2xl shadow-lg p-6 sm:p-8 border border-border-color">
+            <main className="bg-surface rounded-2xl shadow-xl p-6 sm:p-8 border border-border-color">
                 <form onSubmit={onSubmit}>
                     <div className="mb-6">
                         <div className="flex flex-wrap justify-between items-center gap-2">
@@ -119,7 +134,7 @@ export const InputForm: React.FC<InputFormProps> = ({ narrative, onNarrativeChan
                                 type="button"
                                 onClick={handleGenerateClick}
                                 disabled={isGenerating || isLoading}
-                                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-primary bg-blue-100 rounded-lg hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:scale-100"
+                                className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-secondary bg-slate-100 rounded-lg hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:scale-100"
                             >
                                 {isGenerating ? <LoadingSpinner /> : <SparklesIcon className="w-4 h-4" />}
                                 <span>{isGenerating ? 'Generating...' : 'Generate Example Log'}</span>
@@ -136,7 +151,7 @@ export const InputForm: React.FC<InputFormProps> = ({ narrative, onNarrativeChan
                             value={narrative}
                             onChange={(e) => onNarrativeChange(e.target.value)}
                             placeholder="e.g., 'Woke up with a slight headache...' or click the mic to speak."
-                            className="w-full h-64 p-4 pr-14 bg-background border border-border-color rounded-lg text-text-primary placeholder-text-muted focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow duration-200 shadow-inner"
+                            className="w-full h-64 p-4 pr-14 bg-background border-2 border-border-color rounded-lg text-text-primary placeholder-text-muted focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow duration-200 shadow-inner"
                             disabled={isLoading}
                             required
                         />
@@ -148,8 +163,8 @@ export const InputForm: React.FC<InputFormProps> = ({ narrative, onNarrativeChan
                                 aria-label={isListening ? 'Stop Listening' : 'Start Voice Input'}
                                 className={`absolute bottom-4 right-4 p-2 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 ${
                                     isListening
-                                        ? 'bg-red-500 text-white animate-pulse'
-                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                        ? 'bg-red-500 text-white ring-4 ring-red-300 animate-pulse'
+                                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                                 }`}
                             >
                                 <MicrophoneIcon className="w-5 h-5" />
@@ -157,11 +172,11 @@ export const InputForm: React.FC<InputFormProps> = ({ narrative, onNarrativeChan
                         )}
                     </div>
 
-                    <div className="mt-6 flex justify-end">
+                    <div className="mt-8 flex justify-end">
                         <button
                             type="submit"
                             disabled={isLoading || !narrative.trim()}
-                            className="w-full sm:w-auto px-8 py-3 bg-primary text-white font-bold rounded-lg shadow-md hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-hover transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:scale-100"
+                            className="w-full sm:w-auto px-8 py-3 bg-primary text-white font-bold rounded-lg shadow-lg hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-hover transition-all duration-200 transform hover:scale-105 disabled:opacity-50 disabled:scale-100"
                         >
                             {isLoading ? (
                                 <span className="flex items-center justify-center gap-2">
@@ -173,34 +188,44 @@ export const InputForm: React.FC<InputFormProps> = ({ narrative, onNarrativeChan
                 </form>
             </main>
 
-            <section className="mt-12 grid grid-cols-1 gap-8">
+            <section className="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="bg-surface rounded-2xl shadow-lg p-8 border border-border-color">
-                    <h2 className="text-2xl font-bold mb-3 text-text-primary">How It Works: The AI Streamline Engine</h2>
+                    <h2 className="text-2xl font-bold mb-3 text-text-primary flex items-center gap-3">
+                        <span className="flex items-center justify-center w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600">
+                            <LightbulbIcon className="w-6 h-6" />
+                        </span>
+                        How It Works
+                    </h2>
                     <div className="space-y-4 text-text-secondary">
                         <p>
                            This tool demonstrates a Generative AI pipeline that acts as an instant translator between a patient's natural language and structured clinical data.
                         </p>
                         <ul className="list-disc list-outside space-y-2 pl-5">
                              <li>
-                                <strong>Natural Input:</strong> Patients speak or type their health updates in plain English, as if talking to their doctor or writing in a journal. There are no rigid forms, sliders, or drop-down menus.
+                                <strong>Natural Input:</strong> Patients speak or type their health updates in plain English. No rigid forms, sliders, or drop-down menus.
                             </li>
                             <li>
-                                <strong>AI Extraction:</strong> The AI instantly analyzes the free-form narrative, identifying and extracting key clinical data points like symptoms, meals, medication timings, and their severity.
+                                <strong>AI Extraction:</strong> The AI instantly analyzes the free-form narrative, identifying and extracting key clinical data points.
                             </li>
                             <li>
-                                <strong>Structured Output:</strong> The result is a perfectly structured, clean JSON object, ready for clinical analysis—eliminating the friction and cognitive load of manual data entry.
+                                <strong>Structured Output:</strong> The result is a perfectly structured, clean JSON object, ready for clinical analysis, eliminating manual data entry.
                             </li>
                         </ul>
                     </div>
                 </div>
                  <div className="bg-surface rounded-2xl shadow-lg p-8 border border-border-color">
-                    <h2 className="text-2xl font-bold mb-3 text-text-primary">Why This Matters: Solving Patient Disengagement</h2>
+                    <h2 className="text-2xl font-bold mb-3 text-text-primary flex items-center gap-3">
+                        <span className="flex items-center justify-center w-10 h-10 rounded-lg bg-rose-100 text-rose-600">
+                            <HeartIcon className="w-6 h-6" />
+                        </span>
+                        Why This Matters
+                    </h2>
                     <div className="space-y-4 text-text-secondary">
                         <p>
-                            Traditional health apps often fail because they impose a high manual and cognitive burden on users. Patients managing chronic conditions quickly disengage from tools that require them to meticulously fill out forms, leading to inconsistent reporting and incomplete data for clinicians.
+                            Traditional health apps often fail because they impose a high cognitive burden on users. This leads to inconsistent reporting and incomplete data.
                         </p>
                         <p>
-                            This engine is the direct result of thesis research into making patient self-reporting frictionless. By accepting natural language, we can drastically increase patient adherence, empower users, and provide clinicians with the high-quality, consistent data they need. This prototype demonstrates a more intuitive, patient-centric future for digital health.
+                            This engine is the result of research into making self-reporting frictionless. By accepting natural language, we can drastically increase patient adherence and provide clinicians with high-quality data.
                         </p>
                     </div>
                 </div>
