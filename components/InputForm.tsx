@@ -227,6 +227,9 @@ export const InputForm: React.FC<InputFormProps> = ({ narrative, onNarrativeChan
                         <p>
                             This engine is the result of research into making self-reporting frictionless. By accepting natural language, we can drastically increase patient adherence and provide clinicians with high-quality data.
                         </p>
+                        <p>
+                            I built this engine directly from the findings of my MEng thesis, "A Generative AI Approach to Streamline Patient Self-Reporting in RPM and mHealth Interventions."
+                        </p>
                     </div>
                 </div>
             </section>
