@@ -1,0 +1,7 @@
+{
+  "name": "AI Streamline Engine",
+  "description": "An interactive prototype that demonstrates converting unstructured patient narratives into clean, structured JSON data using Generative AI.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
